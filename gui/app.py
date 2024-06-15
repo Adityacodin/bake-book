@@ -2,7 +2,7 @@ import customtkinter as ctk
 import tkinter as tk 
 from PIL import Image
 from gui.admin import AdminWindow
-# from gui.emp import EmployeeWindow
+from gui.emp import EmployeeWindow
 
 class App(ctk.CTk):
     def __init__(self,*args,**kwargs):
@@ -13,7 +13,8 @@ class App(ctk.CTk):
             self.admin_login = AdminWindow(self.main_frame)
 
         def display_employee_win(self):
-            pass
+            self.to_login_frame.destroy()
+            self.emp_login = EmployeeWindow(self.main_frame)
 
         def display_login(self):
             self.to_login_frame = ctk.CTkFrame(master=self.main_frame, fg_color='#ffffff')
