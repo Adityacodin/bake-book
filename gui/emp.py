@@ -6,7 +6,34 @@ class EmployeeWindow(ctk.CTkFrame):
     def __init__(self,master):
         super().__init__(master)
 
-    
+        def display_contents(self):
+
+            cake_scrollFrame = ctk.CTkScrollableFrame(self)
+
+            self.cake_scroll = ctk.CTkScrollableFrame(self.cake_tab)
+            self.cake_scroll.pack(fill = 'both',expand = True)
+            self.pastry_scroll = ctk.CTkScrollableFrame(self.pastry_tab)
+            self.pastry_scroll.pack(fill = 'both',expand = True)
+            self.bread_scroll = ctk.CTkScrollableFrame(self.bread_tab)
+            self.bread_scroll.pack(fill = 'both',expand = True)
+            columns = 3
+            cake_row = len(self.info[0])//columns
+            pastry_row = len(self.info[1])//columns
+            bread_row = len(self.info[2])//columns
+
+            frame_box = []
+
+            for i in range(0,cake_row):
+                frame=ctk.CTkFrame(self.cake_scroll,fg_color='red')
+                frame_box.append(frame)
+                frame_box[i].pack(fill='both', expand=True)
+                
+
+
+
+
+
+        
         def display_employee_interface(self):
             self.frame_one.destroy()
             self.frame_two = ctk.CTkFrame(self,fg_color = '#D2B4DE')
@@ -23,6 +50,10 @@ class EmployeeWindow(ctk.CTkFrame):
             self.pastry_tab = self.Tab.add('Pastry')
             self.bread_tab = self.Tab.add('Breads')
             self.inventory_tab = self.Tab.add('Inventory')
+
+            display_contents(self)
+            
+
 
 
         def is_valid(self,username,password):
@@ -48,12 +79,13 @@ class EmployeeWindow(ctk.CTkFrame):
                     messagebox.showerror('','Password field cannot be empty.')
 
             if is_valid(self,username,password):
-                display_employee_interface(self)
                 self.cake_info = self.db.fetch_results("SELECT * FROM cakes;")
                 self.pastry_info = self.db.fetch_results("SELECT * FROM pastries;")
                 self.bread_info = self.db.fetch_results("SELECT * FROM breads;")
+                self.info = (self.cake_info,self.pastry_info,self.bread_info)
+                display_employee_interface(self)
+                
 
-                print(self.cake_info)
 
             else:
                 messagebox.showerror("Login Failed","Invalid Credentials!")
