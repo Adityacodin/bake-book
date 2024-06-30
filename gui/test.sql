@@ -1,8 +1,8 @@
 USE bakery;
 -- SELECT * FROM breads;
-desc cakes;
-desc pastries;
-desc breads;
+SELECT * FROM cakes;
+SELECT * FROM pastries;
+SELECT * FROM breads;
 -- DESC pastries;
 
 -- CREATE TABLE breads(bread_id INT AUTO_INCREMENT PRIMARY KEY,bakery_name VARCHAR(50) NOT NULL,bread_name VARCHAR(50) UNIQUE,bread_price INT NOT NULL,bread_quantity INT NOT NULL,bread_img VARCHAR(255) NOT NULL,bread_units VARCHAR(50))AUTO_INCREMENT = 300;

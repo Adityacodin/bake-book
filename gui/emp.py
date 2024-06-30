@@ -6,6 +6,71 @@ class EmployeeWindow(ctk.CTkFrame):
     def __init__(self,master):
         super().__init__(master)
 
+        def display_info(self,attributes):
+            self.row = -1
+            if attributes[len(attributes)-1] == 'cake_weight':
+                self.row = 0
+            elif attributes[len(attributes)-1] == 'bread_units':
+                self.row = 2
+            else : 
+                self.row = 1
+            
+
+        def fill_frame(self,product):
+            self.attributes = None
+            self.row = -1
+            self.product_frame = []
+            if product == 'c':
+                self.attributes = ['cake_id','bakery_name','cake_name','cake_price','cake_quantity','cake_img','cake_weight']
+                self.row = 0
+                counter = 0
+                print(self.row)
+                frames = []
+                for i in range(0,self.cake_row):
+                    for j in range(0,3):
+                        frame = ctk.CTkFrame(self.cake_frame[i],fg_color = '#8E44AD')
+                        frame.pack(side='left',fill = 'both',expand = True,padx = 10,pady = 10)
+                        frames.append(frame)
+                        counter+=1
+                        if len(self.info[self.row]) == counter:
+                            break
+                self.product_frame.append(frames)
+                display_info(self,self.attributes)
+
+            elif product == 'p':
+                self.attributes = ['pastry_id','bakery_name','pastry_name','pastry_price','pastry_quantity','pastry_img']
+                self.row = 1
+                counter = 0
+                print(self.row)
+                frames = []
+                for i in range(0,self.pastry_row):
+                    for j in range(0,3):
+                        frame = ctk.CTkFrame(self.pastry_frame[i],fg_color = '#8E44AD')
+                        frame.pack(side='left',fill = 'both',expand = True,padx = 10,pady = 10)
+                        frames.append(frame)
+                        counter+=1
+                        if len(self.info[self.row]) == counter:
+                            break
+                self.product_frame.append(frames)
+                display_info(self,self.attributes)
+
+            elif product == 'b':
+                self.attributes = ['bread_id','bakery_name','bread_name','bread_price','bread_quantity','bread_img','bread_units']
+                self.row =2
+                counter = 0
+                print(self.row)
+                frames = []
+                for i in range(0,self.bread_row):
+                    for j in range(0,3):
+                        frame = ctk.CTkFrame(self.bread_frame[i],fg_color = '#8E44AD')
+                        frame.pack(side='left',fill = 'both',expand = True,padx = 10,pady = 10)
+                        frames.append(frame)
+                        counter+=1
+                        if len(self.info[self.row]) == counter:
+                            break
+                self.product_frame.append(frames)
+                display_info(self,self.attributes)
+
         def display_contents(self):
 
             cake_scrollFrame = ctk.CTkScrollableFrame(self)
@@ -17,16 +82,38 @@ class EmployeeWindow(ctk.CTkFrame):
             self.bread_scroll = ctk.CTkScrollableFrame(self.bread_tab)
             self.bread_scroll.pack(fill = 'both',expand = True)
             columns = 3
-            cake_row = len(self.info[0])//columns
-            pastry_row = len(self.info[1])//columns
-            bread_row = len(self.info[2])//columns
+            self.cake_row = len(self.info[0])//columns + 1
+            self.pastry_row = len(self.info[1])//columns + 1
+            self.bread_row = len(self.info[2])//columns + 1
 
-            frame_box = []
+            self.cake_frame = []
+            for i in range(0,self.cake_row):
+                frame=ctk.CTkFrame(self.cake_scroll,fg_color='#A569BD')
+                self.cake_frame.append(frame)
+                self.cake_frame[i].pack(fill='both', expand=True)
+            fill_frame(self,'c')
 
-            for i in range(0,cake_row):
-                frame=ctk.CTkFrame(self.cake_scroll,fg_color='red')
-                frame_box.append(frame)
-                frame_box[i].pack(fill='both', expand=True)
+
+            self.pastry_frame = []
+            for i in range(0,self.pastry_row):
+                frame=ctk.CTkFrame(self.pastry_scroll,fg_color='#A569BD')
+                self.pastry_frame.append(frame)
+                self.pastry_frame[i].pack(fill='both', expand=True)
+            fill_frame(self,'p')
+                
+            self.bread_frame = []
+            for i in range(0,self.bread_row):
+                frame=ctk.CTkFrame(self.bread_scroll,fg_color='#A569BD')
+                self.bread_frame.append(frame)
+                self.bread_frame[i].pack(fill='both', expand=True)
+            fill_frame(self,'b')
+
+            
+
+            
+
+
+            
                 
 
 
@@ -98,7 +185,7 @@ class EmployeeWindow(ctk.CTkFrame):
         ctk.CTkLabel(self.frame_one,text="Employee Login", font = ("Garamond Bold",20)).pack(side = 'top',pady = 10)
         self.employee_username = ctk.CTkEntry(self.frame_one,placeholder_text = "Username")
         self.employee_username.place(relx = 0.5, rely = 0.4, anchor = ctk.CENTER)
-        self.employee_password = ctk.CTkEntry(self.frame_one,placeholder_text = "Password")
+        self.employee_password = ctk.CTkEntry(self.frame_one,placeholder_text = "Password",show = '*')
         self.employee_password.place(relx = 0.5, rely = 0.45, anchor = ctk.CENTER)
 
         self.login_button = ctk.CTkButton(self.frame_one,text = 'Login',fg_color='#A569BD',hover_color='#8E44AD',command = lambda : login(self.employee_username.get(),self.employee_password.get()))
