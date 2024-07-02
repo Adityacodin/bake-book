@@ -1,6 +1,8 @@
 import customtkinter as ctk
 from db.database import Database
 from tkinter import messagebox
+from PIL import Image
+import math
 
 class EmployeeWindow(ctk.CTkFrame):
     def __init__(self,master):
@@ -8,23 +10,71 @@ class EmployeeWindow(ctk.CTkFrame):
 
         def display_info(self,attributes):
             self.row = -1
+            counter = 0
             if attributes[len(attributes)-1] == 'cake_weight':
                 self.row = 0
+                cake_info = self.product_frame[self.row]
+                self.cake_buttons = []
+                for frame in cake_info:
+                    try:
+                        logo_image = Image.open(str(self.info[self.row][counter][5]))
+                        logo = ctk.CTkImage(light_image=logo_image, size=(100, 100))
+                        ctk.CTkLabel(frame, text='', image=logo).pack(side='top',padx = 10,pady =10)
+                        ctk.CTkLabel(frame,text = str(self.info[self.row][counter][2]+" - "+str(self.info[self.row][counter][3])+" Rs"),font = ("Garamond Bold",15),text_color='white').pack(side = 'top',padx = 10)
+                        ctk.CTkLabel(frame,text = "Quantity - " + str(self.info[self.row][counter][6]),font = ("Garamond Bold",15),text_color='white').pack(side = 'top',padx = 10)
+                        button = ctk.CTkButton(frame,text = 'Add To Cart',text_color = 'white', fg_color='#A569BD', hover_color='#D2B4DE',font = ("Garamond Bold",15))
+                        button.pack(pady = 10,side='top')
+                        self.cake_buttons.append(button)
+                        counter+=1
+                    except FileNotFoundError:
+                        print("Image not found. Please check the path.")
             elif attributes[len(attributes)-1] == 'bread_units':
                 self.row = 2
+                bread_info = self.product_frame[self.row]
+                self.bread_buttons = []
+                for frame in bread_info:
+                    try:
+                        logo_image = Image.open(str(self.info[self.row][counter][5]))
+                        logo = ctk.CTkImage(light_image=logo_image, size=(100, 100))
+                        ctk.CTkLabel(frame, text='', image=logo).pack(side='top',padx = 10,pady =10)
+                        ctk.CTkLabel(frame,text = str(self.info[self.row][counter][2]+" - "+str(self.info[self.row][counter][3])+" Rs"),font = ("Garamond Bold",15),text_color='white').pack(side = 'top',padx = 10)
+                        ctk.CTkLabel(frame,text = "Quantity - " + str(self.info[self.row][counter][6]),font = ("Garamond Bold",15),text_color='white').pack(side = 'top',padx = 10)
+                        button = ctk.CTkButton(frame,text = 'Add To Cart',text_color = 'white', fg_color='#A569BD', hover_color='#D2B4DE',font = ("Garamond Bold",15))
+                        button.pack(pady = 10,side='top')                        
+                        self.bread_buttons.append(button)
+                        counter+=1
+                    except FileNotFoundError:
+                        print("Image not found. Please check the path.")
             else : 
                 self.row = 1
+                pastry_info = self.product_frame[self.row]  
+                self.pastry_buttons = []
+                for frame in pastry_info:
+                    try:
+                        logo_image = Image.open(str(self.info[self.row][counter][5]))
+                        logo = ctk.CTkImage(light_image=logo_image, size=(100, 100))
+                        ctk.CTkLabel(frame, text='', image=logo).pack(side='top',padx = 10,pady =10)
+                        ctk.CTkLabel(frame,text = str(self.info[self.row][counter][2])+" - "+str(self.info[self.row][counter][3])+" Rs",font = ("Garamond Bold",15),text_color='white').pack(side = 'top',padx = 10)
+                        ctk.CTkLabel(frame,text = "Quantity - 1 Unit",font = ("Garamond Bold",15),text_color='white').pack(side = 'top',padx = 10)
+                        button = ctk.CTkButton(frame,text = 'Add To Cart',text_color = 'white', fg_color='#A569BD', hover_color='#D2B4DE',font = ("Garamond Bold",15))
+                        button.pack(pady = 10,side='top')
+                        self.pastry_buttons.append(button)
+                        counter+=1
+                    except FileNotFoundError:
+                        print("Image not found. Please check the path.")
+          
+
+            
             
 
-        def fill_frame(self,product):
+        def fill_frame(self,product,product_frame):
             self.attributes = None
-            self.row = -1
-            self.product_frame = []
+            self.row = -1            
             if product == 'c':
                 self.attributes = ['cake_id','bakery_name','cake_name','cake_price','cake_quantity','cake_img','cake_weight']
                 self.row = 0
                 counter = 0
-                print(self.row)
+                # print(self.row)
                 frames = []
                 for i in range(0,self.cake_row):
                     for j in range(0,3):
@@ -34,14 +84,14 @@ class EmployeeWindow(ctk.CTkFrame):
                         counter+=1
                         if len(self.info[self.row]) == counter:
                             break
-                self.product_frame.append(frames)
+                product_frame.append(frames)
                 display_info(self,self.attributes)
 
             elif product == 'p':
                 self.attributes = ['pastry_id','bakery_name','pastry_name','pastry_price','pastry_quantity','pastry_img']
                 self.row = 1
                 counter = 0
-                print(self.row)
+                # print(self.row)
                 frames = []
                 for i in range(0,self.pastry_row):
                     for j in range(0,3):
@@ -51,14 +101,13 @@ class EmployeeWindow(ctk.CTkFrame):
                         counter+=1
                         if len(self.info[self.row]) == counter:
                             break
-                self.product_frame.append(frames)
+                product_frame.append(frames)
                 display_info(self,self.attributes)
 
             elif product == 'b':
                 self.attributes = ['bread_id','bakery_name','bread_name','bread_price','bread_quantity','bread_img','bread_units']
                 self.row =2
                 counter = 0
-                print(self.row)
                 frames = []
                 for i in range(0,self.bread_row):
                     for j in range(0,3):
@@ -68,30 +117,32 @@ class EmployeeWindow(ctk.CTkFrame):
                         counter+=1
                         if len(self.info[self.row]) == counter:
                             break
-                self.product_frame.append(frames)
+                product_frame.append(frames)
                 display_info(self,self.attributes)
 
         def display_contents(self):
 
             cake_scrollFrame = ctk.CTkScrollableFrame(self)
 
-            self.cake_scroll = ctk.CTkScrollableFrame(self.cake_tab)
+            self.cake_scroll = ctk.CTkScrollableFrame(self.cake_tab,fg_color = '#A569BD')
             self.cake_scroll.pack(fill = 'both',expand = True)
-            self.pastry_scroll = ctk.CTkScrollableFrame(self.pastry_tab)
+            self.pastry_scroll = ctk.CTkScrollableFrame(self.pastry_tab,fg_color = '#A569BD')
             self.pastry_scroll.pack(fill = 'both',expand = True)
-            self.bread_scroll = ctk.CTkScrollableFrame(self.bread_tab)
+            self.bread_scroll = ctk.CTkScrollableFrame(self.bread_tab,fg_color = '#A569BD')
             self.bread_scroll.pack(fill = 'both',expand = True)
             columns = 3
-            self.cake_row = len(self.info[0])//columns + 1
-            self.pastry_row = len(self.info[1])//columns + 1
-            self.bread_row = len(self.info[2])//columns + 1
-
+            self.cake_row = math.ceil(len(self.info[0])/columns)
+            self.pastry_row = math.ceil(len(self.info[1])/columns)
+            self.bread_row = math.ceil(len(self.info[2])/columns)
+            print("bread_row_count = ",self.bread_row)
+            self.product_frame = []
             self.cake_frame = []
             for i in range(0,self.cake_row):
                 frame=ctk.CTkFrame(self.cake_scroll,fg_color='#A569BD')
                 self.cake_frame.append(frame)
                 self.cake_frame[i].pack(fill='both', expand=True)
-            fill_frame(self,'c')
+            fill_frame(self,'c',self.product_frame)
+            
 
 
             self.pastry_frame = []
@@ -99,14 +150,14 @@ class EmployeeWindow(ctk.CTkFrame):
                 frame=ctk.CTkFrame(self.pastry_scroll,fg_color='#A569BD')
                 self.pastry_frame.append(frame)
                 self.pastry_frame[i].pack(fill='both', expand=True)
-            fill_frame(self,'p')
+            fill_frame(self,'p',self.product_frame)
                 
             self.bread_frame = []
             for i in range(0,self.bread_row):
                 frame=ctk.CTkFrame(self.bread_scroll,fg_color='#A569BD')
                 self.bread_frame.append(frame)
                 self.bread_frame[i].pack(fill='both', expand=True)
-            fill_frame(self,'b')
+            fill_frame(self,'b',self.product_frame)
 
             
 
