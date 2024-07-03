@@ -30,7 +30,6 @@ class App(ctk.CTk):
             ctk.CTkButton(self.to_login_frame, text='Admin', fg_color='#A569BD', hover_color='#8E44AD', command=lambda: display_admin_win(self)).place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
             ctk.CTkButton(self.to_login_frame, text='Employee', fg_color='#A569BD', hover_color='#8E44AD', command= lambda: display_employee_win(self)).place(relx=0.5, rely=0.57, anchor=ctk.CENTER)
 
-
         self.title("Bakebook")
         self.geometry('800x650')
         self.main_frame = ctk.CTkFrame(self,fg_color = 'light gray')

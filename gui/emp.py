@@ -8,6 +8,45 @@ class EmployeeWindow(ctk.CTkFrame):
     def __init__(self,master):
         super().__init__(master)
 
+        def checkout(self):
+            if str(type(self.order_list)) == "<class 'NoneType'>" :
+                messagebox.showerror('Invalid action','Cart is empty')
+            elif str(type(self.order_list)) == "<class 'list'>" and len(self.order_list) == 0:
+                messagebox.showerror('Invalid action','Cart is empty')
+            else :
+                print(self.order_list)
+
+
+        def clicked_proceed(self,win):
+            win.destroy()
+            self.order_list.clear()
+
+        def clicked_cancel(win):
+            win.destroy()
+
+        def new_order(self):
+            if str(type(self.order_list)) != "<class 'NoneType'>":
+                msg_app = ctk.CTk()
+                frame = ctk.CTkFrame(msg_app)
+                frame.pack(fill = 'both',expand = True)
+                ctk.CTkLabel(frame,text = "There happens to be some items in the cart from previous order, if you proceed then the record of items from previous order which was not completed will be deleted.").pack(padx = 10, pady = 20)
+                proceed_btn = ctk.CTkButton(frame,text = 'Proceed',command = lambda : clicked_proceed(self,msg_app))
+                proceed_btn.place(relx = 0.3,rely = 0.6)
+                cancel_btn = ctk.CTkButton(frame,text = 'Cancel',command = lambda : clicked_cancel(msg_app))
+                cancel_btn.place(relx = 0.6,rely = 0.6)
+                msg_app.geometry('950x150')
+                msg_app.mainloop()
+            else :
+                self.order_list = []
+                messagebox.showinfo('','New cart has been initialised, you may proceed to add items')            
+                
+        def add_to_cart(self,product_info,product_type):
+            if str(type(self.order_list)) == "<class 'NoneType'>":
+                messagebox.showerror("Warning","Kindly initialise a new cart in order to add items in to the cart")
+            else:
+                self.order_list.append(product_info)
+            
+
         def display_info(self,attributes):
             self.row = -1
             counter = 0
@@ -20,9 +59,10 @@ class EmployeeWindow(ctk.CTkFrame):
                         logo_image = Image.open(str(self.info[self.row][counter][5]))
                         logo = ctk.CTkImage(light_image=logo_image, size=(100, 100))
                         ctk.CTkLabel(frame, text='', image=logo).pack(side='top',padx = 10,pady =10)
+                        product_name = self.info[self.row][counter]
                         ctk.CTkLabel(frame,text = str(self.info[self.row][counter][2]+" - "+str(self.info[self.row][counter][3])+" Rs"),font = ("Garamond Bold",15),text_color='white').pack(side = 'top',padx = 10)
                         ctk.CTkLabel(frame,text = "Quantity - " + str(self.info[self.row][counter][6]),font = ("Garamond Bold",15),text_color='white').pack(side = 'top',padx = 10)
-                        button = ctk.CTkButton(frame,text = 'Add To Cart',text_color = 'white', fg_color='#A569BD', hover_color='#D2B4DE',font = ("Garamond Bold",15))
+                        button = ctk.CTkButton(frame,text = 'Add To Cart',text_color = 'white', fg_color='#A569BD', hover_color='#D2B4DE',font = ("Garamond Bold",15),command = lambda product_info = product_name : add_to_cart(self,product_info,'cake'))
                         button.pack(pady = 10,side='top')
                         self.cake_buttons.append(button)
                         counter+=1
@@ -37,9 +77,10 @@ class EmployeeWindow(ctk.CTkFrame):
                         logo_image = Image.open(str(self.info[self.row][counter][5]))
                         logo = ctk.CTkImage(light_image=logo_image, size=(100, 100))
                         ctk.CTkLabel(frame, text='', image=logo).pack(side='top',padx = 10,pady =10)
+                        product_name = self.info[self.row][counter]
                         ctk.CTkLabel(frame,text = str(self.info[self.row][counter][2]+" - "+str(self.info[self.row][counter][3])+" Rs"),font = ("Garamond Bold",15),text_color='white').pack(side = 'top',padx = 10)
                         ctk.CTkLabel(frame,text = "Quantity - " + str(self.info[self.row][counter][6]),font = ("Garamond Bold",15),text_color='white').pack(side = 'top',padx = 10)
-                        button = ctk.CTkButton(frame,text = 'Add To Cart',text_color = 'white', fg_color='#A569BD', hover_color='#D2B4DE',font = ("Garamond Bold",15))
+                        button = ctk.CTkButton(frame,text = 'Add To Cart',text_color = 'white', fg_color='#A569BD', hover_color='#D2B4DE',font = ("Garamond Bold",15),command = lambda product_info = product_name : add_to_cart(self,product_info,'bread'))
                         button.pack(pady = 10,side='top')                        
                         self.bread_buttons.append(button)
                         counter+=1
@@ -54,9 +95,10 @@ class EmployeeWindow(ctk.CTkFrame):
                         logo_image = Image.open(str(self.info[self.row][counter][5]))
                         logo = ctk.CTkImage(light_image=logo_image, size=(100, 100))
                         ctk.CTkLabel(frame, text='', image=logo).pack(side='top',padx = 10,pady =10)
+                        product_name = self.info[self.row][counter]
                         ctk.CTkLabel(frame,text = str(self.info[self.row][counter][2])+" - "+str(self.info[self.row][counter][3])+" Rs",font = ("Garamond Bold",15),text_color='white').pack(side = 'top',padx = 10)
                         ctk.CTkLabel(frame,text = "Quantity - 1 Unit",font = ("Garamond Bold",15),text_color='white').pack(side = 'top',padx = 10)
-                        button = ctk.CTkButton(frame,text = 'Add To Cart',text_color = 'white', fg_color='#A569BD', hover_color='#D2B4DE',font = ("Garamond Bold",15))
+                        button = ctk.CTkButton(frame,text = 'Add To Cart',text_color = 'white', fg_color='#A569BD', hover_color='#D2B4DE',font = ("Garamond Bold",15),command = lambda product_info = product_name : add_to_cart(self,product_info,'pastry'))
                         button.pack(pady = 10,side='top')
                         self.pastry_buttons.append(button)
                         counter+=1
@@ -137,6 +179,7 @@ class EmployeeWindow(ctk.CTkFrame):
             print("bread_row_count = ",self.bread_row)
             self.product_frame = []
             self.cake_frame = []
+            self.order_list = None
             for i in range(0,self.cake_row):
                 frame=ctk.CTkFrame(self.cake_scroll,fg_color='#A569BD')
                 self.cake_frame.append(frame)
@@ -158,24 +201,17 @@ class EmployeeWindow(ctk.CTkFrame):
                 self.bread_frame.append(frame)
                 self.bread_frame[i].pack(fill='both', expand=True)
             fill_frame(self,'b',self.product_frame)
-
-            
-
-            
-
-
-            
-                
-
-
-
-
-
         
         def display_employee_interface(self):
             self.frame_one.destroy()
             self.frame_two = ctk.CTkFrame(self,fg_color = '#D2B4DE')
             self.frame_two.pack(fill = 'both',expand = True)
+
+            self.new_cart_btn = ctk.CTkButton(self.frame_two,text = "New Order",command = lambda: new_order(self),text_color = 'white',fg_color='#A569BD',hover_color='#8E44AD',font = ("Garamond Bold",15))
+            self.new_cart_btn.pack(side = 'top',padx = 10,pady = 10)
+
+            self.checkout_btn = ctk.CTkButton(self.frame_two,text = "Checkout",command = lambda: checkout(self),text_color = 'white',fg_color='#A569BD',hover_color='#8E44AD',font = ("Garamond Bold",15))
+            self.checkout_btn.pack(side = 'bottom',padx = 10,pady = 10)
 
             self.Tab = ctk.CTkTabview(self.frame_two,fg_color='#8E44AD',
             segmented_button_fg_color='#8E44AD',
