@@ -3,19 +3,84 @@ from db.database import Database
 from tkinter import messagebox
 from PIL import Image
 import math
+from gui.spinbox import FloatSpinbox
+from tkinter import ttk
+
+
 
 class EmployeeWindow(ctk.CTkFrame):
     def __init__(self,master):
         super().__init__(master)
 
-        def checkout(self):
-            if str(type(self.order_list)) == "<class 'NoneType'>" :
-                messagebox.showerror('Invalid action','Cart is empty')
-            elif str(type(self.order_list)) == "<class 'list'>" and len(self.order_list) == 0:
-                messagebox.showerror('Invalid action','Cart is empty')
-            else :
-                print(self.order_list)
+        # def on_closing():
+        #     del open_windows[product_id]
+        #     quantity_window.destroy()
 
+        def add(self,product_info,quantity,quantity_win):
+            if str(quantity).isnumeric() :
+                 self.order_list.append((product_info,int(quantity)))
+                 self.open_windows.remove(int(product_info[0]))
+                 quantity_win.destroy()
+
+        def calculate(list):
+            sum = 0
+            for entry in list:
+                sum += int(entry[len(entry)-1])
+            return sum
+
+        def clicked_confirmed(self,closing_window):
+            self.flag = True
+            closing_window.destroy()
+            
+            for entry in self.order_list:
+                if entry[0][len(entry[0])-1] == 'One Kilo' or entry[0][len(entry[0])-1] == 'Half Kilo':
+                    print(1)
+                    self.db.execute_query("UPDATE cakes SET cake_quantity = cake_quantity-%s WHERE cake_id = %s",(str(entry[1]),str(entry[0][0])))
+                elif len(entry[0]) == 7:
+                    print(3)
+                    self.db.execute_query("UPDATE breads SET bread_quantity = bread_quantity-%s WHERE bread_id = %s",(str(entry[1]),str(entry[0][0])))
+                elif len(entry[0]) == 6:
+                    print(2)
+                    self.db.execute_query("UPDATE pastries SET pastry_quantity = pastry_quantity-%s WHERE pastry_id = %s",(str(entry[1]),str(entry[0][0])))
+
+            total = calculate(self.info1)
+            messagebox.showinfo('Success',f'Order Processed Successfully\nOrder Total is {total} Rs')
+
+
+ 
+        def confirm_order(self):
+            confirm_window = ctk.CTk()
+            confirm_window.geometry('900x500')
+            confirm_window.title('Confirm Order')
+            frame = ctk.CTkFrame(confirm_window,fg_color = '#8E44AD')
+            frame.pack(fill = 'both',expand = True)
+            self.info1 = []
+            i=0
+            for entry in self.order_list:
+                self.info1.append([str(entry[0][0]),entry[0][2],str(entry[1]),str(entry[1]*entry[0][3])])
+
+            table = ttk.Treeview(frame,columns=('prod_id','prod_name','quantity','price'),show='headings')
+            table.heading('prod_id',text = 'Product ID')
+            table.heading('prod_name',text = 'Product')
+            table.heading('quantity',text = 'Quantity')
+            table.heading('price',text = 'Price')
+            for i in range(len(self.info1)):
+                data = self.info1[i]
+                table.insert(parent='',index = 0, values = data)
+            table.pack(fill = 'both',expand = True,padx = 20,pady = 20)
+            confirm_btn = ctk.CTkButton(frame,text = 'Confirm',command = lambda : clicked_confirmed(self,confirm_window))
+            confirm_btn.pack(padx = 10,pady = 10)
+            confirm_window.mainloop()
+        
+        def checkout(self):
+            self.flag = False
+            if str(type(self.order_list)) == "<class 'NoneType'>" :
+                messagebox.showerror('Invalid action','Cart is empty N')
+            elif str(type(self.order_list)) == "<class 'list'>" and len(self.order_list) == 0:
+                messagebox.showerror('Invalid action','Cart is empty F')
+            else :
+                confirm_order(self)
+                
 
         def clicked_proceed(self,win):
             win.destroy()
@@ -38,13 +103,33 @@ class EmployeeWindow(ctk.CTkFrame):
                 msg_app.mainloop()
             else :
                 self.order_list = []
-                messagebox.showinfo('','New cart has been initialised, you may proceed to add items')            
+                self.open_windows = []
+                messagebox.showinfo('','New cart has been initialised, you may proceed to add items') 
+
+        def check(self,product_id) : 
+            if product_id in self.open_windows:
+                return False
+            else :
+                return True
+
                 
         def add_to_cart(self,product_info,product_type):
             if str(type(self.order_list)) == "<class 'NoneType'>":
                 messagebox.showerror("Warning","Kindly initialise a new cart in order to add items in to the cart")
-            else:
-                self.order_list.append(product_info)
+            else : 
+                if check(self,int(product_info[0])) :
+                    self.open_windows.append(int(product_info[0]))
+                    quantity_win = ctk.CTk()
+                    quantity_win.geometry('400x100')
+                    quantity_win.title('Quantity for '+ str(product_info[2]))
+                    frame = ctk.CTkFrame(quantity_win,fg_color = '#8E44AD')
+                    frame.pack(fill = 'both',expand = True)
+                    quantity = FloatSpinbox(frame,step_size = 1,to_value = product_info[4])
+                    quantity.place(relx = 0.5,rely = 0.4 ,anchor = ctk.CENTER)
+                    proceed_btn = ctk.CTkButton(frame,text = 'Proceed',command = lambda : add(self,product_info,quantity.get(),quantity_win))
+                    proceed_btn.pack(side = 'bottom',padx = 10,pady = 10)
+                    quantity_win.mainloop()
+                    self.order_list.append(product_info)
             
 
         def display_info(self,attributes):
@@ -161,11 +246,37 @@ class EmployeeWindow(ctk.CTkFrame):
                             break
                 product_frame.append(frames)
                 display_info(self,self.attributes)
+        
+        def insert_values(self):
+            cake_selected = self.cake_table.get_children()
+            pastry_selected = self.pastry_table.get_children()
+            bread_selected = self.bread_table.get_children()
+            if (len(cake_selected) + len(pastry_selected)+len(bread_selected)) != 0:
+                for item in cake_selected:
+                    self.cake_table.delete(item)
+                for item in pastry_selected:
+                    self.pastry_table.delete(item)
+                for item in bread_selected:
+                    self.bread_table.delete(item)
+            
+            cake_info = self.db.fetch_results("Select cake_id,cake_name,cake_quantity FROM cakes;")
+            pastry_info = self.db.fetch_results("Select pastry_id,pastry_name,pastry_quantity FROM pastries;")
+            bread_info = self.db.fetch_results("Select bread_id,bread_name,bread_quantity FROM breads;")
+
+            for i in range(0,len(cake_info)):
+                data = cake_info[len(cake_info)-1-i]
+                self.cake_table.insert(parent='',index = 0, values = data)
+            for i in range(0,len(pastry_info)):
+                data = pastry_info[len(pastry_info)-1-i]
+                self.pastry_table.insert(parent='',index = 0, values = data)
+            for i in range(0,len(bread_info)):
+                data = bread_info[len(bread_info)-1-i]
+                self.bread_table.insert(parent='',index = 0, values = data)
+            
+
+            
 
         def display_contents(self):
-
-            cake_scrollFrame = ctk.CTkScrollableFrame(self)
-
             self.cake_scroll = ctk.CTkScrollableFrame(self.cake_tab,fg_color = '#A569BD')
             self.cake_scroll.pack(fill = 'both',expand = True)
             self.pastry_scroll = ctk.CTkScrollableFrame(self.pastry_tab,fg_color = '#A569BD')
@@ -185,8 +296,6 @@ class EmployeeWindow(ctk.CTkFrame):
                 self.cake_frame.append(frame)
                 self.cake_frame[i].pack(fill='both', expand=True)
             fill_frame(self,'c',self.product_frame)
-            
-
 
             self.pastry_frame = []
             for i in range(0,self.pastry_row):
@@ -201,7 +310,31 @@ class EmployeeWindow(ctk.CTkFrame):
                 self.bread_frame.append(frame)
                 self.bread_frame[i].pack(fill='both', expand=True)
             fill_frame(self,'b',self.product_frame)
-        
+
+            # display_inventory
+            self.inv_frame = ctk.CTkScrollableFrame(self.inventory_tab,fg_color='#8E44AD')
+            self.inv_frame.pack(fill = 'both',expand =True)
+            self.refresh_btn = ctk.CTkButton(self.inv_frame,text = 'Refresh',command = lambda : insert_values(self)) 
+            self.refresh_btn.pack(padx = 10,pady = 10)
+            self.cake_table = ttk.Treeview(self.inv_frame,columns = ('cid','c_prod','c_quant'),show = 'headings')
+            self.cake_table.heading('cid',text='Cake ID')
+            self.cake_table.heading('c_prod',text='Cake Name')
+            self.cake_table.heading('c_quant',text='Quantity')
+            self.cake_table.pack(pady = 10)
+
+            self.pastry_table = ttk.Treeview(self.inv_frame,columns = ('cid','c_prod','c_quant'),show = 'headings')
+            self.pastry_table.heading('cid',text='Pastry ID')
+            self.pastry_table.heading('c_prod',text='Pastry Name')
+            self.pastry_table.heading('c_quant',text='Quantity')
+            self.pastry_table.pack(pady =10)
+
+            self.bread_table = ttk.Treeview(self.inv_frame,columns = ('cid','c_prod','c_quant'),show = 'headings')
+            self.bread_table.heading('cid',text='Bread ID')
+            self.bread_table.heading('c_prod',text='Bread Name')
+            self.bread_table.heading('c_quant',text='Quantity')
+            self.bread_table.pack(pady = 10)
+            insert_values(self)            
+    
         def display_employee_interface(self):
             self.frame_one.destroy()
             self.frame_two = ctk.CTkFrame(self,fg_color = '#D2B4DE')
@@ -222,9 +355,8 @@ class EmployeeWindow(ctk.CTkFrame):
             self.Tab.pack(padx = 10, pady = 10,fill = 'both',expand = True)
             self.cake_tab = self.Tab.add('Cake')
             self.pastry_tab = self.Tab.add('Pastry')
-            self.bread_tab = self.Tab.add('Breads')
+            self.bread_tab = self.Tab.add('Bread')
             self.inventory_tab = self.Tab.add('Inventory')
-
             display_contents(self)
             
 
