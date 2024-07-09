@@ -1,5 +1,7 @@
 USE bakery;
 -- SELECT * FROM breads;
+-- SHOW TABLES;
+-- SELECT * FROM users
 SELECT * FROM cakes;
 SELECT * FROM pastries;
 SELECT * FROM breads;
