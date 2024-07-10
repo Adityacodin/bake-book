@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from db.database import Database
 # from cryptography.fernet import 
-# from gui.table import Table 
+from gui.spinbox import FloatSpinbox 
 from tkinter import ttk
 from tkinter import messagebox
 
@@ -54,7 +54,32 @@ class AdminWindow(ctk.CTkFrame):
 
                 self.tab_win.mainloop()         
                 self.flag = False
-                print(self.flag)   
+                print(self.flag)  
+
+        def add(self,p_upd,category):
+            if str(self.spin.get()).isnumeric():
+                if category == 'Cake':
+                    self.db_cursor.execute_query("UPDATE cakes set cake_quantity = cake_quantity + %s WHERE cake_id = %s",(str(self.spin.get()),str(p_upd[0])))
+                elif category == 'Pastry':
+                    self.db_cursor.execute_query("UPDATE pastries set pastry_quantity = pastry_quantity + %s WHERE pastry_id = %s",(str(self.spin.get()),str(p_upd[0])))
+                elif category == 'Bread':
+                    self.db_cursor.execute_query("UPDATE breads set bread_quantity = bread_quantity + %s WHERE bread_id = %s",(str(self.spin.get()),str(p_upd[0])))
+                messagebox.showinfo("Success","Inventory Update Successfully")
+            else :
+                messagebox.showerror("Invalid data","Please enter Numerical Values")
+
+
+        def update_quantity(self,p_upd,category):
+            self.spin_win = ctk.CTk()
+            self.spin_win.title(f'Update {p_upd[1]}')
+            self.spin_win.geometry('300x200')
+            self.frame = ctk.CTkFrame(self.spin_win,fg_color = '#8E44AD')
+            self.frame.pack(fill = 'both',expand = True)
+            self.spin = FloatSpinbox(self.frame,step_size= 1,to_value = 100)
+            self.spin.place(relx = 0.5,rely  =0.4,anchor = ctk.CENTER)
+            self.add_btn = ctk.CTkButton(self.frame,text = 'Add',command =lambda : add(self,p_upd,category))
+            self.add_btn.place(relx = 0.5,rely = 0.6,anchor = ctk.CENTER)
+            self.spin_win.mainloop()
 
         def valid(self,data):
             if data.isnumeric() :
@@ -79,18 +104,20 @@ class AdminWindow(ctk.CTkFrame):
                 else :
                     messagebox.showerror("Invalid data","enter valid product id".title())
                     return
-                ctk.CTkLabel(self.prod_frame,text = f'Product Name : {self.product_to_be_updated[1]}',font = ("Garamond Bold",15),text_color = 'white').pack(padx = 30,pady = 10,side = 'top')
-                ctk.CTkLabel(self.prod_frame,text = f'Product Quantity : {self.product_to_be_updated[2]}',font = ("Garamond Bold",15),text_color = 'white').pack(padx = 30,pady = 10,side = 'top')
-                ctk.CTkLabel(self.prod_frame,text = f'Product Price : {self.product_to_be_updated[3]}',font = ("Garamond Bold",15),text_color = 'white').pack(padx = 30,pady = 10,side = 'top')
+
                 category = None
                 if entry[0] < 200:
-                    category = 'cakes'
+                    category = 'cake'.title()
                 elif entry[0] < 300:
-                    category = 'pastry'
+                    category = 'pastry'.title()
                 else :
-                    category = 'bread'
-                ctk.CTkLabel(self.prod_frame,text = f'Category : {category}',font = ("Garamond Bold",15),text_color = 'white').pack(padx = 30,pady = 10,side = 'top')
-
+                    category = 'bread'.title()
+                ctk.CTkLabel(self.prod_frame,text = f'Product Name : {self.product_to_be_updated[1]}',font = ("Garamond Bold",15),text_color = 'white').place(relx = 0.2,rely = 0.1,anchor =ctk.CENTER)
+                ctk.CTkLabel(self.prod_frame,text = f'Product Quantity : {self.product_to_be_updated[2]}',font = ("Garamond Bold",15),text_color = 'white').place(relx = 0.2,rely = 0.3,anchor =ctk.CENTER)
+                self.change_quant_btn = ctk.CTkButton(self.prod_frame,text = 'Update Inventory',command = lambda : update_quantity(self,self.product_to_be_updated,category))
+                self.change_quant_btn.place(relx = 0.5,rely = 0.3,anchor = ctk.CENTER)
+                ctk.CTkLabel(self.prod_frame,text = f'Product Price : {self.product_to_be_updated[3]}',font = ("Garamond Bold",15),text_color = 'white').place(relx = 0.2,rely = 0.5,anchor =ctk.CENTER)
+                ctk.CTkLabel(self.prod_frame,text = f'Category : {category}',font = ("Garamond Bold",15),text_color = 'white').place(relx = 0.2,rely = 0.7,anchor =ctk.CENTER)
             else :
                 messagebox.showerror("Invalid data","enter valid product id".title())
 
@@ -105,11 +132,7 @@ class AdminWindow(ctk.CTkFrame):
             self.product_id.place(relx = 0.5, rely = 0.4, anchor = ctk.CENTER)
             self.load_btn = ctk.CTkButton(self.in_frame,text = 'Ok',command = lambda : valid(self,self.product_id.get()))
             self.load_btn.place(relx = 0.7,rely = 0.4,anchor = ctk.CENTER)
-            # print(self.inv_info)
             
-
-
-
         def display_orders(self):
             self.flag = False
             
