@@ -92,19 +92,20 @@ class AdminWindow(ctk.CTkFrame):
                 if id>=100 and id<=self.inv_info[0][len(self.inv_info[0])-1][0] :
                     for entry in self.inv_info[0]:
                         if entry[0] == id:
-                            self.product_to_be_updated = entry
+                            self.product_to_be_updated = self.db_cursor.fetch_results("SELECT cake_id,cake_name,cake_quantity,cake_price FROM cakes WHERE cake_id = %s",str(id))
+                            print(self.product_to_be_updated)
                 elif id>=200 and id<=self.inv_info[1][len(self.inv_info[1])-1][0] :
                     for entry in self.inv_info[1]:
                         if entry[0] == id:
-                            self.product_to_be_updated = entry
+                            self.product_to_be_updated = self.db_cursor.fetch_results("SELECT pastry_id,pastry_name,pastry_quantity,pastry_price FROM pastries WHERE pastry_id = %s",str(id))
                 elif id>=300 and id<=self.inv_info[2][len(self.inv_info[2])-1][0] :
                     for entry in self.inv_info[2]:
                         if entry[0] == id:
-                            self.product_to_be_updated = entry
+                            self.product_to_be_updated = self.db_cursor.fetch_results("SELECT bread_id,bread_name,bread_quantity,bread_price FROM breads WHERE bread_id = %s",str(id))
                 else :
                     messagebox.showerror("Invalid data","enter valid product id".title())
                     return
-
+                
                 category = None
                 if entry[0] < 200:
                     category = 'cake'.title()
@@ -112,11 +113,11 @@ class AdminWindow(ctk.CTkFrame):
                     category = 'pastry'.title()
                 else :
                     category = 'bread'.title()
-                ctk.CTkLabel(self.prod_frame,text = f'Product Name : {self.product_to_be_updated[1]}',font = ("Garamond Bold",15),text_color = 'white').place(relx = 0.2,rely = 0.1,anchor =ctk.CENTER)
-                ctk.CTkLabel(self.prod_frame,text = f'Product Quantity : {self.product_to_be_updated[2]}',font = ("Garamond Bold",15),text_color = 'white').place(relx = 0.2,rely = 0.3,anchor =ctk.CENTER)
-                self.change_quant_btn = ctk.CTkButton(self.prod_frame,text = 'Update Inventory',command = lambda : update_quantity(self,self.product_to_be_updated,category))
+                ctk.CTkLabel(self.prod_frame,text = f'Product Name : {self.product_to_be_updated[0][1]}',font = ("Garamond Bold",15),text_color = 'white').place(relx = 0.2,rely = 0.1,anchor =ctk.CENTER)
+                ctk.CTkLabel(self.prod_frame,text = f'Product Quantity : {self.product_to_be_updated[0][2]}',font = ("Garamond Bold",15),text_color = 'white').place(relx = 0.2,rely = 0.3,anchor =ctk.CENTER)
+                self.change_quant_btn = ctk.CTkButton(self.prod_frame,text = 'Update Inventory',command = lambda : update_quantity(self,self.product_to_be_updated[0],category))
                 self.change_quant_btn.place(relx = 0.5,rely = 0.3,anchor = ctk.CENTER)
-                ctk.CTkLabel(self.prod_frame,text = f'Product Price : {self.product_to_be_updated[3]}',font = ("Garamond Bold",15),text_color = 'white').place(relx = 0.2,rely = 0.5,anchor =ctk.CENTER)
+                ctk.CTkLabel(self.prod_frame,text = f'Product Price : {self.product_to_be_updated[0][3]}',font = ("Garamond Bold",15),text_color = 'white').place(relx = 0.2,rely = 0.5,anchor =ctk.CENTER)
                 ctk.CTkLabel(self.prod_frame,text = f'Category : {category}',font = ("Garamond Bold",15),text_color = 'white').place(relx = 0.2,rely = 0.7,anchor =ctk.CENTER)
             else :
                 messagebox.showerror("Invalid data","enter valid product id".title())
@@ -135,12 +136,148 @@ class AdminWindow(ctk.CTkFrame):
             
         def display_orders(self):
             self.flag = False
-            
-        def display_staff(self):
-            self.flag = False
 
+        def display_emp(self):
+                self.emp_tab = ctk.CTk()
+                self.emp_tab.title('Inventory Table')
+                self.emp_tab.geometry('800x650')
+                self.main_fme = ctk.CTkFrame(self.tab_win,fg_color = '#8E44AD')
+                self.main_fme.pack(fill = 'both',expand = True)
+                self.emp_table = ttk.Treeview(self.main.fme,columns = ('cid','c_prod','c_quant','c_price'),show = 'headings')
+                self.emp_table.heading('cid',text='Employee ID')
+                self.emp_table.heading('c_prod',text='Employee Name')
+                self.emp_table.heading('c_quant',text='username')
+                self.emp_table.heading('c_price',text = 'password')
+                self.emp_table.pack(pady = 10)
+                emp_info = self.db_cursor.fetch_results("")
+                self.emp_tab.mainloop()
+    
+        def show_p(self):
+                if self.n%2 == 0:
+                    self.pass_ent.configure(show = '')
+                    self.cpass_ent.configure(show = '')
+                    self.n+=1
+                else:
+                    self.pass_ent.configure(show = '*')
+                    self.cpass_ent.configure(show = '*')
+                    self.n+=1
+
+        def val(self):
+                if self.pass_ent.get() == self.cpass_ent.get():
+                    u_n = len(self.db_cursor.fetch_results("SELECT * FROM users WHERE username = %s;",(self.user_ent.get())))
+                    if u_n == 0 :
+                        self.db_cursor.execute_query("INSERT INTO users(username,password,role,u_name,age) VALUES (%s,%s,'employee',%s,%s);",(self.user_ent.get(),self.pass_ent.get(),self.emp_name_ent.get(),self.spin_emp.get()))
+                        messagebox.showerror('Success',"Employee registration successful".title())             
+                    else:
+                        print(len(self.db_cursor.fetch_results("SELECT * FROM users WHERE username = %s;",self.user_ent.get())))
+                        messagebox.showerror("Oops!!","Username already exists")
+                else:
+                    messagebox.showerror("Oops!!","Try Again")
+
+        def display_staff(self):
+            # self.emp_table = ttk.Treeview(self.staff_tab,columns = ('cid','c_prod','c_quant','c_price'),show = 'headings')
+            # self.emp_table.heading('cid',text='Employee ID')
+            # self.emp_table.heading('c_prod',text='Employee Name')
+            # self.emp_table.heading('c_quant',text='username')
+            # self.emp_table.heading('c_price',text = 'password')
+            # self.emp_table.pack(pady = 10)
+            self.win = None
+            self.emp_list = ctk.CTkButton(self.staff_tab,text = 'Employee Info')
+            self.emp_list.pack(padx = 20,pady = 20)
+            self.main_f = ctk.CTkFrame(self.staff_tab,fg_color='#D2B4DE')
+            self.main_f.pack(fill='both',expand = True)
+            self.emp_name_lb = ctk.CTkLabel(self.main_f,text = 'Enter Employee Name : ')
+            self.emp_name_lb.place(relx = 0.2,rely = 0.2, anchor=ctk.CENTER)
+            self.emp_name_ent = ctk.CTkEntry(self.main_f,placeholder_text  = "Full Name")
+            self.emp_name_ent.place(relx = 0.6,rely = 0.2,anchor =ctk.CENTER)
+            self.emp_age_lb = ctk.CTkLabel(self.main_f,text = 'Age : ')
+            self.emp_age_lb.place(relx = 0.2,rely = 0.3, anchor=ctk.CENTER)
+            self.spin_emp = FloatSpinbox(self.main_f,step_size= 1,to_value = 50)
+            self.spin_emp.place(relx = 0.4,rely  =0.3,anchor = ctk.CENTER)
+            self.user_lb = ctk.CTkLabel(self.main_f,text = 'Username: ')
+            self.user_lb.place(relx = 0.2,rely = 0.4, anchor=ctk.CENTER)
+            self.user_ent = ctk.CTkEntry(self.main_f)
+            self.user_ent.place(relx = 0.6,rely = 0.4,anchor =ctk.CENTER)
+            self.pass_lb = ctk.CTkLabel(self.main_f,text = 'Set Password : ')
+            self.pass_lb.place(relx = 0.2,rely = 0.5, anchor=ctk.CENTER)
+            self.pass_ent = ctk.CTkEntry(self.main_f,show = '*')
+            self.pass_ent.place(relx = 0.6,rely = 0.5,anchor =ctk.CENTER)
+            self.c_pass_lb = ctk.CTkLabel(self.main_f,text = 'Confirm Password')
+            self.c_pass_lb.place(relx = 0.2,rely = 0.6, anchor=ctk.CENTER)
+            self.cpass_ent = ctk.CTkEntry(self.main_f,show = '*')
+            self.cpass_ent.place(relx = 0.6,rely = 0.6,anchor =ctk.CENTER)
+            self.n = 0
+            self.show_pass = ctk.CTkButton(self.main_f,text = 'Show',command = lambda : show_p(self))
+            self.show_pass.place(relx = 0.9,rely = 0.6,anchor =ctk.CENTER)
+            self.reg_button = ctk.CTkButton(self.main_f,text = 'Register',command = lambda : val(self))
+            self.reg_button.place(relx= 0.5,rely  = 0.7,ancho = ctk.CENTER)
+
+        def insert_values(self):
+            cake_selected = self.cake_table.get_children()
+            pastry_selected = self.pastry_table.get_children()
+            bread_selected = self.bread_table.get_children()
+            if (len(cake_selected) + len(pastry_selected)+len(bread_selected)) != 0:
+                for item in cake_selected:
+                    self.cake_table.delete(item)
+                for item in pastry_selected:
+                    self.pastry_table.delete(item)
+                for item in bread_selected:
+                    self.bread_table.delete(item)
+            
+            cake_info = self.db_cursor.fetch_results("Select cake_id,cake_name,cake_quantity,cake_price FROM cakes;")
+            pastry_info = self.db_cursor.fetch_results("Select pastry_id,pastry_name,pastry_quantity,pastry_price FROM pastries;")
+            bread_info = self.db_cursor.fetch_results("Select bread_id,bread_name,bread_quantity,bread_price FROM breads;")
+
+            for i in range(0,len(cake_info)):
+                data = cake_info[len(cake_info)-1-i]
+                self.cake_table.insert(parent='',index = 0, values = data)
+            for i in range(0,len(pastry_info)):
+                data = pastry_info[len(pastry_info)-1-i]
+                self.pastry_table.insert(parent='',index = 0, values = data)
+            for i in range(0,len(bread_info)):
+                data = bread_info[len(bread_info)-1-i]
+                self.bread_table.insert(parent='',index = 0, values = data)
+            
         def display_products(self):
             self.flag = False
+            self.refresh_btn = ctk.CTkButton(self.product_tab,text = 'Refresh',command = lambda : insert_values(self)) 
+            self.refresh_btn.pack(padx = 10,pady = 10)
+            self.main_fm = ctk.CTkScrollableFrame(self.product_tab,fg_color = '#8E44AD')
+            self.main_fm.pack(fill = 'both',expand = True)
+            self.cake_table = ttk.Treeview(self.main_fm,columns = ('cid','c_prod','c_quant','c_price'),show = 'headings')
+            self.cake_table.heading('cid',text='ID')
+            self.cake_table.heading('c_prod',text='Cake Name')
+            self.cake_table.heading('c_quant',text='Quantity')
+            self.cake_table.heading('c_price',text = 'Price')
+            self.cake_table.pack(pady = 10)
+
+            self.pastry_table = ttk.Treeview(self.main_fm,columns = ('cid','c_prod','c_quant','c_price'),show = 'headings')
+            self.pastry_table.heading('cid',text='PaID')
+            self.pastry_table.heading('c_prod',text='Pastry Name')
+            self.pastry_table.heading('c_quant',text='Quantity')
+            self.pastry_table.heading('c_price',text = 'Price')
+            self.pastry_table.pack(pady =10)
+
+            self.bread_table = ttk.Treeview(self.main_fm,columns = ('cid','c_prod','c_quant','c_price'),show = 'headings')
+            self.bread_table.heading('cid',text='BID')
+            self.bread_table.heading('c_prod',text='Bread Name')
+            self.bread_table.heading('c_quant',text='Quantity')
+            self.pastry_table.heading('c_price',text = 'Price')
+            self.bread_table.pack(pady = 10)
+
+            for i in range(0,3):
+                List = self.inv_info[i]
+                c=0
+                for j in range(0,len(List)):
+                    data = List[len(List)-1-c]
+                    c+=1
+                    if i==0:
+                        self.cake_table.insert(parent='',index = 0, values = data)
+                    elif i == 1:
+                        self.pastry_table.insert(parent='',index = 0, values = data)
+                    elif i==2:
+                        self.bread_table.insert(parent='',index = 0, values = data)
+
 
         def display_admin_interface(self):
             self.frame_one.destroy()

@@ -42,7 +42,7 @@ class FloatSpinbox(customtkinter.CTkFrame):
             value = int(self.entry.get()) + self.step_size
             if value > self.to_value:
                 value -= self.step_size
-                messagebox.showerror('Warning','Inventory Limit Reached')
+                messagebox.showerror('Warning','Limit Reached')
             self.entry.delete(0, "end")
             self.entry.insert(0, value)
         except ValueError:

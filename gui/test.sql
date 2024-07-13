@@ -2,10 +2,10 @@ USE bakery;
 -- SELECT * FROM breads;
 -- SHOW TABLES;
 -- SELECT * FROM users
-SELECT * FROM cakes;
-SELECT * FROM pastries;
-SELECT * FROM breads;
--- DESC pastries;
+-- SELECT * FROM cakes;
+-- SELECT * FROM pastries;
+-- SELECT * FROM breads;
+-- -- DESC pastries;
 
 -- CREATE TABLE breads(bread_id INT AUTO_INCREMENT PRIMARY KEY,bakery_name VARCHAR(50) NOT NULL,bread_name VARCHAR(50) UNIQUE,bread_price INT NOT NULL,bread_quantity INT NOT NULL,bread_img VARCHAR(255) NOT NULL,bread_units VARCHAR(50))AUTO_INCREMENT = 300;
 
@@ -17,4 +17,23 @@ SELECT * FROM breads;
 -- ('bakery1','Butter Rusk',50,30,'C:/Users/33333333333333333333/gitdemo/bake-book/images/b6.jpg','Pack of 20'),
 -- ('bakery1','Whole Grain bread',50,30,'C:/Users/33333333333333333333/gitdemo/bake-book/images/b7.jpg','1 Loaf');
 
+-- CREATE TABLE orders (
+--     order_id INT AUTO_INCREMENT PRIMARY KEY,
+--     order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+--     status VARCHAR(50),
+--     total_amount INT,
+--     payment_method VARCHAR(50)
+-- );
 
+-- CREATE TABLE order_items (
+--     order_item_id INT AUTO_INCREMENT PRIMARY KEY,
+--     order_id INT,
+--     product_id INT,
+--     quantity INT,
+--     price INT,
+--     FOREIGN KEY (order_id) REFERENCES orders(order_id)
+-- );
+
+-- ALTER TABLE users ADD u_name VARCHAR(100);
+-- ALTER TABLE users ADD age INT;
+SELECT * FROM users;

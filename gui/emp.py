@@ -44,6 +44,7 @@ class EmployeeWindow(ctk.CTkFrame):
                     self.db.execute_query("UPDATE pastries SET pastry_quantity = pastry_quantity-%s WHERE pastry_id = %s",(str(entry[1]),str(entry[0][0])))
 
             total = calculate(self.info1)
+            
             messagebox.showinfo('Success',f'Order Processed Successfully\nOrder Total is {total} Rs')
 
 
